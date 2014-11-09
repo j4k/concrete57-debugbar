@@ -53,6 +53,21 @@ class Controller extends Package {
 
         $debugStack = new \Doctrine\DBAL\Logging\DebugStack();
 
+        $bar['time']->startMeasure('c5start', 'Concrete5 Boot');
+
+        // $bar['time']->measure('My long operation', function() {
+        //     sleep(2);
+        // });
+        try {
+          throw new \Exception('This is a test exception');
+        } catch (\Exception $e) {
+          $bar['exceptions']->addException($e);
+        }
+
+        $message = 'This is a string message variable';
+
+        $bar['messages']->addMessage($message);
+
         // Cache javascript renderer object.
         $renderer = $bar->getJavascriptRenderer('/packages/concrete5_debug/vendor/maximebf/debugbar/src/DebugBar/Resources/');
 
@@ -65,9 +80,12 @@ class Controller extends Package {
             View::getInstance()->addHeaderItem($renderer->renderHead());
         }
 
-        Events::addListener('on_before_render', function() use ($renderer) {
+        Events::addListener('on_before_render', function() use ($renderer, $bar) {
             View::getInstance()->addFooterItem($renderer->render());
         });
+
+
+          $bar['time']->stopMeasure('c5start');
     }
 
 }
